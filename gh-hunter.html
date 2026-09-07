@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔭 GitHub 开源项目猎手</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --card: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --orange: #d29922;
+    --red: #f85149;
+    --purple: #bc8cff;
+    --pink: #f778ba;
+    --radius: 8px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding: 20px 24px;
+    background: var(--card);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .logo {
+    font-size: 22px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .logo:hover { color: var(--accent); }
+  .logo-sub {
+    font-size: 12px;
+    color: var(--text-dim);
+    font-weight: 400;
+  }
+  .nav-tabs {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .nav-tab {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 13px;
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .nav-tab:hover { border-color: var(--accent); color: var(--text); }
+  .nav-tab.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 24px;
+  }
+  .toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .toolbar select, .toolbar input {
+    padding: 8px 12px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+    min-width: 120px;
+  }
+  .toolbar select:focus, .toolbar input:focus {
+    border-color: var(--accent);
+  }
+  .toolbar input { flex: 1; min-width: 200px; }
+  .btn {
+    padding: 8px 18px;
+    border-radius: var(--radius);
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover { background: #79c0ff; }
+  .btn-green {
+    background: var(--green);
+    color: #fff;
+  }
+  .btn-green:hover { filter: brightness(1.1); }
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .btn-outline:hover { border-color: var(--accent); }
+  .btn-sm { padding: 4px 12px; font-size: 12px; }
+  .stats-bar {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .stat {
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+  .stat strong { color: var(--text); }
+  .repo-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .repo-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    transition: all .2s;
+    cursor: pointer;
+  }
+  .repo-card:hover {
+    border-color: var(--accent);
+    background: #1c2333;
+  }
+  .repo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .repo-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .repo-name:hover { text-decoration: underline; }
+  .repo-stars {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+  .repo-stars .num { font-weight: 600; color: var(--orange); }
+  .repo-stars-today {
+    font-size: 12px;
+    color: var(--green);
+    margin-left: 6px;
+  }
+  .repo-desc {
+    color: var(--text-dim);
+    font-size: 13px;
+    margin-top: 6px;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .repo-meta {
+    display: flex;
+    gap: 16px;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--text-dim);
+    flex-wrap: wrap;
+  }
+  .repo-meta .lang {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .lang-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .repo-meta .topic-tag {
+    padding: 1px 8px;
+    border-radius: 12px;
+    background: rgba(88,166,255,.15);
+    color: var(--accent);
+    font-size: 11px;
+  }
+  .repo-velocity {
+    font-size: 12px;
+    color: var(--purple);
+  }
+  .loading {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-dim);
+  }
+  .spinner {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+    margin-bottom: 12px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-dim);
+  }
+  .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+  .error-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--red);
+  }
+  .title-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .title-bar h2 {
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .title-bar .count {
+    font-size: 13px;
+    color: var(--text-dim);
+    font-weight: 400;
+  }
+  .pagination {
+    display: flex;
+    gap: 4px;
+    margin-top: 16px;
+    justify-content: center;
+  }
+  .page-btn {
+    padding: 4px 12px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .page-btn:hover { border-color: var(--accent); }
+  .page-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .page-btn:disabled { opacity: .4; cursor: default; }
+
+  /* Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,.7);
+    z-index: 200;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 28px;
+    position: relative;
+    animation: modalIn .2s ease;
+  }
+  @keyframes modalIn { from { transform: scale(.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .modal-close {
+    position: absolute;
+    top: 12px; right: 16px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 24px;
+    cursor: pointer;
+  }
+  .modal-close:hover { color: var(--text); }
+  .modal h2 { font-size: 20px; margin-bottom: 4px; }
+  .modal .gh-link {
+    color: var(--accent);
+    font-size: 14px;
+    text-decoration: none;
+  }
+  .modal .gh-link:hover { text-decoration: underline; }
+  .modal .desc { color: var(--text-dim); margin: 12px 0; line-height: 1.6; }
+  .modal .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 16px 0;
+  }
+  .modal .detail-item {
+    padding: 10px 14px;
+    background: var(--bg);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+  }
+  .modal .detail-item .label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+  .modal .detail-item .value {
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+  .modal .topics {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+  .modal .topics span {
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: rgba(88,166,255,.15);
+    color: var(--accent);
+    font-size: 12px;
+  }
+  .modal .btn-open {
+    display: inline-block;
+    margin-top: 16px;
+    padding: 10px 24px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: var(--radius);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .modal .btn-open:hover { background: #79c0ff; }
+
+  .token-hint {
+    font-size: 12px;
+    color: var(--text-dim);
+    text-align: right;
+  }
+  .token-hint a { color: var(--accent); }
+
+  @media (max-width: 640px) {
+    .header-inner { flex-direction: column; align-items: flex-start; }
+    .nav-tabs { width: 100%; overflow-x: auto; }
+    .toolbar { flex-direction: column; }
+    .toolbar input { width: 100%; }
+    .modal .detail-grid { grid-template-columns: 1fr; }
+    .repo-header { flex-direction: column; }
+  }
+
+  /* 语言颜色 */
+  .lang-Python { background: #3572A5; }
+  .lang-JavaScript { background: #f1e05a; }
+  .lang-TypeScript { background: #3178c6; }
+  .lang-Rust { background: #dea584; }
+  .lang-Go { background: #00ADD8; }
+  .lang-Java { background: #b07219; }
+  .lang-C { background: #555555; }
+  .lang-CPP { background: #f34b7d; }
+  .lang-CSharp { background: #178600; }
+  .lang-Ruby { background: #701516; }
+  .lang-Swift { background: #F05138; }
+  .lang-Kotlin { background: #A97BFF; }
+  .lang-PHP { background: #4F5D95; }
+  .lang-Shell { background: #89e051; }
+  .lang-HTML { background: #e34c26; }
+  .lang-CSS { background: #563d7c; }
+  .lang-Scala { background: #c22d40; }
+  .lang-Dart { background: #00B4AB; }
+  .lang-Lua { background: #000080; }
+  .lang-Zig { background: #ec915c; }
+  .lang-GDScript { background: #355570; }
+  .lang-LLVM { background: #185619; }
+  .lang-CMake { background: #DA3434; }
+  .lang-Makefile { background: #427819; }
+  .lang-PowerShell { background: #012456; }
+  .lang-Assembly { background: #6E4C13; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="logo" onclick="switchTab('trending')">
+      🔭 gh-hunter
+      <span class="logo-sub">GitHub 开源项目猎手</span>
+    </div>
+    <div class="nav-tabs" id="navTabs">
+      <button class="nav-tab active" data-tab="trending">🔥 热搜</button>
+      <button class="nav-tab" data-tab="language">⭐ 语言分类</button>
+      <button class="nav-tab" data-tab="topic">🏷️ 话题分类</button>
+      <button class="nav-tab" data-tab="new">🆕 新项目</button>
+      <button class="nav-tab" data-tab="rising">🚀 高速增长</button>
+      <button class="nav-tab" data-tab="search">🔍 搜索</button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div id="toolbarArea"></div>
+  <div id="statsBar" class="stats-bar" style="display:none"></div>
+  <div id="titleBar" class="title-bar"></div>
+  <div id="content"><div class="empty-state"><div class="icon">🔭</div><h3>GitHub 开源项目猎手</h3><p style="color:var(--text-dim);margin-top:8px">热搜排行榜 · 高星分类 · 新项目发现</p><p style="color:var(--text-dim);font-size:13px;margin-top:4px">选择一个分类开始探索</p></div></div>
+  <div id="pagination" class="pagination"></div>
+  <div class="token-hint" style="margin-top:24px;padding-top:12px;border-top:1px solid var(--border)">
+    💡 未登录状态下 GitHub API 限制 60次/小时。
+    <a href="https://github.com/settings/tokens" target="_blank">设置 Token</a>
+    可提升至 5000次/小时（在浏览器控制台执行 <code>localStorage.setItem('gh_token','你的token')</code>）
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalContent">
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+//  Config
+// ═══════════════════════════════════════════
+const GH_TOKEN = localStorage.getItem('gh_token') || '';
+const API_BASE = 'https://api.github.com';
+
+const LANG_CATEGORIES = [
+  ['all', '🌐 所有语言'],
+  ['python', 'Python'],
+  ['javascript', 'JavaScript'],
+  ['typescript', 'TypeScript'],
+  ['rust', 'Rust'],
+  ['go', 'Go'],
+  ['java', 'Java'],
+  ['c++', 'C++'],
+  ['c', 'C'],
+  ['c#', 'C#'],
+  ['ruby', 'Ruby'],
+  ['swift', 'Swift'],
+  ['kotlin', 'Kotlin'],
+  ['php', 'PHP'],
+  ['lua', 'Lua'],
+  ['zig', 'Zig'],
+  ['dart', 'Dart'],
+  ['shell', 'Shell'],
+  ['r', 'R'],
+  ['scala', 'Scala'],
+];
+
+const LANG_MAP = Object.fromEntries([
+  ['python', 'Python'], ['javascript', 'JavaScript'], ['typescript', 'TypeScript'],
+  ['rust', 'Rust'], ['go', 'Go'], ['java', 'Java'], ['c++', 'C++'], ['c', 'C'],
+  ['c#', 'C#'], ['ruby', 'Ruby'], ['swift', 'Swift'], ['kotlin', 'Kotlin'],
+  ['php', 'PHP'], ['lua', 'Lua'], ['zig', 'Zig'], ['dart', 'Dart'],
+  ['shell', 'Shell'], ['r', 'R'], ['scala', 'Scala'],
+]);
+
+const TOPIC_CATEGORIES = [
+  ['ai-ml', '🤖 AI/机器学习'],
+  ['llm', '🧠 LLM/大模型'],
+  ['web', '🌐 Web开发'],
+  ['cli', '💻 命令行工具'],
+  ['devops', '⚙️ DevOps'],
+  ['database', '🗄️ 数据库'],
+  ['game', '🎮 游戏开发'],
+  ['mobile', '📱 移动开发'],
+  ['security', '🔒 安全'],
+  ['blockchain', '⛓️ 区块链/Web3'],
+  ['data-science', '📊 数据科学'],
+  ['frontend', '🎨 前端'],
+  ['backend', '🖥️ 后端'],
+  ['rust-wasm', '🦀 Rust/WASM'],
+];
+
+const SINCE_OPTIONS = [
+  ['daily', '今日'],
+  ['weekly', '本周'],
+  ['monthly', '本月'],
+];
+
+// ═══════════════════════════════════════════
+//  State
+// ═══════════════════════════════════════════
+let currentTab = 'trending';
+let currentPage = 1;
+let currentData = [];
+let currentQuery = {};
+
+// ═══════════════════════════════════════════
+//  API
+// ═══════════════════════════════════════════
+async function ghFetch(url, params = {}) {
+  const qs = Object.entries(params).filter(([_,v]) => v).map(([k,v]) => `${k}=${encodeURIComponent(v)}`).join('&');
+  const fullUrl = url + (qs ? '?' + qs : '');
+  const headers = { 'Accept': 'application/vnd.github.v3+json' };
+  if (GH_TOKEN) headers['Authorization'] = `token ${GH_TOKEN}`;
+  const resp = await fetch(fullUrl, { headers });
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.message || `HTTP ${resp.status}`);
+  }
+  return resp.json();
+}
+
+async function searchRepos(query, sort = 'stars', order = 'desc', perPage = 25, page = 1) {
+  const data = await ghFetch(`${API_BASE}/search/repositories`, {
+    q: query, sort, order, per_page: perPage, page,
+  });
+  return { items: data.items || [], total: data.total_count || 0 };
+}
+
+function parseRepo(item) {
+  return {
+    name: item.full_name,
+    url: item.html_url,
+    description: item.description || '暂无描述',
+    stars: item.stargazers_count,
+    forks: item.forks_count,
+    language: item.language || '',
+    topics: item.topics || [],
+    created_at: item.created_at || '',
+    updated_at: item.updated_at || '',
+    license_name: item.license?.spdx_id || '',
+    owner_avatar: item.owner?.avatar_url || '',
+    stars_today: 0,
+  };
+}
+
+// ═══════════════════════════════════════════
+//  Format
+// ═══════════════════════════════════════════
+function fmtNum(n) {
+  if (n >= 10000) return (n / 10000).toFixed(1) + 'w';
+  if (n >= 1000) return (n / 1000).toFixed(1) + 'k';
+  return String(n);
+}
+
+function fmtDate(dateStr) {
+  if (!dateStr) return '-';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+}
+
+function timeAgo(dateStr) {
+  if (!dateStr) return '';
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const days = Math.floor(diff / 86400000);
+  if (days < 1) return '今天';
+  if (days < 30) return `${days}天前`;
+  if (days < 365) return `${Math.floor(days/30)}个月前`;
+  return `${Math.floor(days/365)}年前`;
+}
+
+// ═══════════════════════════════════════════
+//  UI Components
+// ═══════════════════════════════════════════
+function renderRepoCard(repo, showVelocity = false, showToday = false) {
+  const langColor = repo.language ? `lang-${repo.language.replace(/[+#.]/g, '')}` : '';
+  const ageDays = repo.created_at ? Math.floor((Date.now() - new Date(repo.created_at).getTime()) / 86400000) : 0;
+  const velocity = ageDays > 0 ? (repo.stars / ageDays).toFixed(1) : repo.stars;
+
+  return `<div class="repo-card" onclick="showDetail('${repo.name}')">
+    <div class="repo-header">
+      <a class="repo-name" href="${repo.url}" target="_blank" onclick="event.stopPropagation()">${repo.name}</a>
+      <div class="repo-stars">
+        ⭐ <span class="num">${fmtNum(repo.stars)}</span>
+        ${showToday && repo.stars_today ? `<span class="repo-stars-today">+${fmtNum(repo.stars_today)} 今日</span>` : ''}
+      </div>
+    </div>
+    <div class="repo-desc">${escapeHtml(repo.description)}</div>
+    <div class="repo-meta">
+      ${repo.language ? `<span class="lang"><span class="lang-dot ${langColor}"></span>${repo.language}</span>` : ''}
+      <span>⑂ ${fmtNum(repo.forks)}</span>
+      ${showVelocity ? `<span class="repo-velocity">⚡ ${velocity}/天</span>` : ''}
+      ${repo.created_at ? `<span>📅 ${timeAgo(repo.created_at)}</span>` : ''}
+      ${repo.license_name ? `<span>📜 ${repo.license_name}</span>` : ''}
+      ${repo.topics.slice(0, 3).map(t => `<span class="topic-tag">${t}</span>`).join('')}
+    </div>
+  </div>`;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ═══════════════════════════════════════════
+//  Modal
+// ═══════════════════════════════════════════
+async function showDetail(fullName) {
+  const overlay = document.getElementById('modalOverlay');
+  const body = document.getElementById('modalBody');
+  body.innerHTML = '<div class="loading"><div class="spinner"></div><p>加载中...</p></div>';
+  overlay.classList.add('show');
+
+  try {
+    const data = await ghFetch(`${API_BASE}/repos/${fullName}`);
+    const repo = parseRepo(data);
+    const ageDays = repo.created_at ? Math.floor((Date.now() - new Date(repo.created_at).getTime()) / 86400000) : 0;
+    const velocity = ageDays > 0 ? (repo.stars / ageDays).toFixed(1) : repo.stars;
+
+    body.innerHTML = `
+      <h2>📦 ${repo.name}</h2>
+      <a class="gh-link" href="${repo.url}" target="_blank">${repo.url} ↗</a>
+      <p class="desc">${escapeHtml(repo.description)}</p>
+      <div class="detail-grid">
+        <div class="detail-item"><div class="label">⭐ Stars</div><div class="value" style="color:var(--orange)">${fmtNum(repo.stars)}</div></div>
+        <div class="detail-item"><div class="label">⑂ Forks</div><div class="value">${fmtNum(repo.forks)}</div></div>
+        <div class="detail-item"><div class="label">🔤 语言</div><div class="value">${repo.language || 'N/A'}</div></div>
+        <div class="detail-item"><div class="label">⚡ 日均获星</div><div class="value" style="color:var(--purple)">${velocity}</div></div>
+        <div class="detail-item"><div class="label">📜 许可证</div><div class="value">${repo.license_name || 'N/A'}</div></div>
+        <div class="detail-item"><div class="label">📅 创建时间</div><div class="value" style="font-size:14px">${fmtDate(repo.created_at)}</div></div>
+      </div>
+      ${repo.topics.length ? `<div class="topics">${repo.topics.map(t => `<span>${t}</span>`).join('')}</div>` : ''}
+      <a class="btn-open" href="${repo.url}" target="_blank">🌐 在 GitHub 打开</a>
+    `;
+  } catch (e) {
+    body.innerHTML = `<div class="error-state">❌ 加载失败: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ═══════════════════════════════════════════
+//  Tab Switching
+// ═══════════════════════════════════════════
+function switchTab(tab) {
+  currentTab = tab;
+  currentPage = 1;
+
+  document.querySelectorAll('.nav-tab').forEach(el => {
+    el.classList.toggle('active', el.dataset.tab === tab);
+  });
+
+  renderToolbar();
+  loadData();
+}
+
+function renderToolbar() {
+  const area = document.getElementById('toolbarArea');
+  let html = '<div class="toolbar">';
+
+  switch (currentTab) {
+    case 'trending':
+      html += `<select id="sinceSelect">${SINCE_OPTIONS.map(([v,l]) => `<option value="${v}">${l}</option>`).join('')}</select>`;
+      html += `<select id="langSelect"><option value="">全部语言</option>${LANG_CATEGORIES.filter(([k])=>k!=='all').map(([k,l]) => `<option value="${k}">${l}</option>`).join('')}</select>`;
+      html += `<button class="btn btn-primary" onclick="loadData()">🔥 搜索热搜</button>`;
+      break;
+    case 'language':
+      html += `<select id="langSelect"><option value="python">Python</option>${LANG_CATEGORIES.filter(([k])=>k!=='all').map(([k,l]) => `<option value="${k}">${l}</option>`).join('')}</select>`;
+      html += `<button class="btn btn-primary" onclick="loadData()">⭐ 查看高星项目</button>`;
+      break;
+    case 'topic':
+      html += `<select id="topicSelect">${TOPIC_CATEGORIES.map(([v,l]) => `<option value="${v}">${l}</option>`).join('')}</select>`;
+      html += `<button class="btn btn-primary" onclick="loadData()">🏷️ 浏览项目</button>`;
+      break;
+    case 'new':
+      html += `<input type="number" id="minStars" placeholder="最低星数" value="50" style="width:100px">`;
+      html += `<button class="btn btn-green" onclick="loadData()">🆕 发现新项目</button>`;
+      break;
+    case 'rising':
+      html += `<button class="btn btn-primary" onclick="loadData()">🚀 查看高速增长项目</button>`;
+      break;
+    case 'search':
+      html += `<input type="text" id="searchInput" placeholder="输入关键词搜索，如：RAG framework、game engine、stable diffusion..." value="${currentQuery.q || ''}">`;
+      html += `<button class="btn btn-primary" onclick="loadData()">🔍 搜索</button>`;
+      break;
+  }
+  html += '</div>';
+  area.innerHTML = html;
+
+  // 恢复之前的选择
+  if (currentQuery.since && document.getElementById('sinceSelect')) document.getElementById('sinceSelect').value = currentQuery.since;
+  if (currentQuery.lang && document.getElementById('langSelect')) document.getElementById('langSelect').value = currentQuery.lang;
+  if (currentQuery.topic && document.getElementById('topicSelect')) document.getElementById('topicSelect').value = currentQuery.topic;
+  if (currentQuery.minStars && document.getElementById('minStars')) document.getElementById('minStars').value = currentQuery.minStars;
+  if (currentQuery.q && document.getElementById('searchInput')) document.getElementById('searchInput').value = currentQuery.q;
+}
+
+// ═══════════════════════════════════════════
+//  Data Loading
+// ═══════════════════════════════════════════
+async function loadData() {
+  const content = document.getElementById('content');
+  const statsBar = document.getElementById('statsBar');
+  const titleBar = document.getElementById('titleBar');
+  const pagination = document.getElementById('pagination');
+
+  content.innerHTML = '<div class="loading"><div class="spinner"></div><p>正在加载...</p></div>';
+  statsBar.style.display = 'none';
+  titleBar.innerHTML = '';
+  pagination.innerHTML = '';
+
+  try {
+    let items = [], total = 0, title = '', showVelocity = false, showToday = false;
+
+    switch (currentTab) {
+      case 'trending': {
+        const since = document.getElementById('sinceSelect')?.value || 'daily';
+        const langKey = document.getElementById('langSelect')?.value || '';
+        currentQuery = { since, lang: langKey };
+        const sinceName = SINCE_OPTIONS.find(([v]) => v === since)?.[1] || since;
+        title = `🔥 GitHub 热搜 — ${sinceName}`;
+
+        // 用搜索 API 模拟 Trending
+        const days = since === 'daily' ? 7 : since === 'weekly' ? 30 : 90;
+        const date = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
+        let query = `pushed:>=${date} stars:>100`;
+        if (langKey && LANG_MAP[langKey]) query += ` language:${LANG_MAP[langKey]}`;
+        const data = await searchRepos(query, 'stars', 'desc', 25, currentPage);
+        items = data.items.map(parseRepo);
+        total = data.total;
+        showToday = true;
+        break;
+      }
+      case 'language': {
+        const langKey = document.getElementById('langSelect')?.value || 'python';
+        currentQuery = { lang: langKey };
+        const ghLang = LANG_MAP[langKey] || '';
+        const label = LANG_CATEGORIES.find(([k]) => k === langKey)?.[1] || langKey;
+        title = `⭐ ${label} 高星排行榜`;
+        let query = 'stars:>100';
+        if (ghLang) query += ` language:${ghLang}`;
+        const data = await searchRepos(query, 'stars', 'desc', 25, currentPage);
+        items = data.items.map(parseRepo);
+        total = data.total;
+        break;
+      }
+      case 'topic': {
+        const topicKey = document.getElementById('topicSelect')?.value || 'ai-ml';
+        currentQuery = { topic: topicKey };
+        const label = TOPIC_CATEGORIES.find(([k]) => k === topicKey)?.[1] || topicKey;
+        title = `🏷️ ${label} 精选项目`;
+        const data = await searchRepos(`topic:${topicKey} stars:>50`, 'stars', 'desc', 25, currentPage);
+        items = data.items.map(parseRepo);
+        total = data.total;
+        break;
+      }
+      case 'new': {
+        const minStars = parseInt(document.getElementById('minStars')?.value) || 50;
+        currentQuery = { minStars };
+        const threeMonthsAgo = new Date(Date.now() - 90 * 86400000).toISOString().slice(0, 10);
+        title = `🆕 近3个月新星项目 (≥${minStars}⭐)`;
+        const data = await searchRepos(`created:>=${threeMonthsAgo} stars:>=${minStars}`, 'stars', 'desc', 25, currentPage);
+        items = data.items.map(parseRepo);
+        total = data.total;
+        showVelocity = true;
+        break;
+      }
+      case 'rising': {
+        currentQuery = {};
+        const lastMonth = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
+        title = `🚀 高速增长项目 (近30天活跃, >500⭐)`;
+        const data = await searchRepos(`pushed:>=${lastMonth} stars:>500`, 'stars', 'desc', 25, currentPage);
+        items = data.items.map(parseRepo);
+        total = data.total;
+        break;
+      }
+      case 'search': {
+        const q = document.getElementById('searchInput')?.value.trim();
+        if (!q) {
+          content.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><h3>输入关键词搜索</h3><p style="color:var(--text-dim);margin-top:8px">搜索全 GitHub 上的开源项目</p></div>';
+          return;
+        }
+        currentQuery = { q };
+        title = `🔍 搜索结果: ${escapeHtml(q)}`;
+        const data = await searchRepos(q, 'stars', 'desc', 25, currentPage);
+        items = data.items.map(parseRepo);
+        total = data.total;
+        break;
+      }
+    }
+
+    currentData = items;
+
+    // Title
+    titleBar.innerHTML = `<h2>${title} <span class="count">共 ${total.toLocaleString()} 个结果</span></h2>`;
+
+    // Stats
+    if (items.length) {
+      const totalStars = items.reduce((s, r) => s + r.stars, 0);
+      const langSet = new Set(items.map(r => r.language).filter(Boolean));
+      statsBar.style.display = 'flex';
+      statsBar.innerHTML = `
+        <span class="stat">📦 项目 <strong>${items.length}</strong></span>
+        <span class="stat">⭐ 总星数 <strong>${fmtNum(totalStars)}</strong></span>
+        <span class="stat">🔤 语言 <strong>${langSet.size}</strong></span>
+      `;
+    } else {
+      statsBar.style.display = 'none';
+    }
+
+    // Content
+    if (items.length === 0) {
+      content.innerHTML = '<div class="empty-state"><div class="icon">📭</div><h3>没有找到项目</h3><p style="color:var(--text-dim);margin-top:8px">换个条件试试？</p></div>';
+      return;
+    }
+
+    content.innerHTML = '<div class="repo-grid">' +
+      items.map(r => renderRepoCard(r, showVelocity, showToday)).join('') +
+      '</div>';
+
+    // Pagination
+    const totalPages = Math.min(Math.ceil(total / 25), 20);
+    if (totalPages > 1) {
+      let phtml = '';
+      phtml += `<button class="page-btn" onclick="goPage(${currentPage - 1})" ${currentPage <= 1 ? 'disabled' : ''}>‹</button>`;
+      for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+        phtml += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+      }
+      phtml += `<button class="page-btn" onclick="goPage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''}>›</button>`;
+      pagination.innerHTML = phtml;
+    }
+
+  } catch (e) {
+    content.innerHTML = `<div class="error-state"><p>❌ ${escapeHtml(e.message)}</p><p style="margin-top:12px;font-size:13px;color:var(--text-dim)">可能是 API 限流了，设置 Token 可提升限额</p></div>`;
+  }
+}
+
+function goPage(page) {
+  if (page < 1) return;
+  currentPage = page;
+  document.getElementById('content').scrollIntoView({ behavior: 'smooth' });
+  loadData();
+}
+
+// ═══════════════════════════════════════════
+//  Init
+// ═══════════════════════════════════════════
+document.querySelectorAll('.nav-tab').forEach(el => {
+  el.addEventListener('click', () => switchTab(el.dataset.tab));
+});
+
+// 默认加载 trending
+switchTab('trending');
+</script>
+</body>
+</html>
